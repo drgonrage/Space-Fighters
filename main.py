@@ -88,29 +88,28 @@ def draw_winner(text):
         pg.display.update()
         pg.time.delay(5000) 
       
-     
-#=========================================================Draw-Window============================================#    
+#=============================Draw-Winner========================#   
            
 #------------------------Player1-Handling------------------------#    
 def yellow_handle_movement(keys_pressed, yellow):
-    if keys_pressed[pg.K_a] and yellow.x - VEL > 0:  # LEFT
+    if keys_pressed[pg.K_a] and yellow.x - VEL > 0:
         yellow.x -= VEL
-    if keys_pressed[pg.K_d] and yellow.x + VEL + yellow.width < BORDER.x:  # RIGHT
+    if keys_pressed[pg.K_d] and yellow.x + VEL + yellow.width < BORDER.x:
         yellow.x += VEL
-    if keys_pressed[pg.K_w] and yellow.y - VEL > 0:  # UP
+    if keys_pressed[pg.K_w] and yellow.y - VEL > 0:
         yellow.y -= VEL
-    if keys_pressed[pg.K_s] and yellow.y + VEL + yellow.height < HEIGHT - 15:  # DOWN
+    if keys_pressed[pg.K_s] and yellow.y + VEL + yellow.height < HEIGHT - 15:
         yellow.y += VEL
 
 
 def red_handle_movement(keys_pressed, red):
-    if keys_pressed[pg.K_LEFT] and red.x - VEL > BORDER.x + BORDER.width:  # LEFT
+    if keys_pressed[pg.K_LEFT] and red.x - VEL > BORDER.x + BORDER.width + 12:
         red.x -= VEL
-    if keys_pressed[pg.K_RIGHT] and red.x + VEL + red.width < WIDTH:  # RIGHT
+    if keys_pressed[pg.K_RIGHT] and red.x + VEL + red.width < WIDTH + 10:
         red.x += VEL
-    if keys_pressed[pg.K_UP] and red.y - VEL > 0:  # UP
+    if keys_pressed[pg.K_UP] and red.y - VEL > 0:
         red.y -= VEL
-    if keys_pressed[pg.K_DOWN] and red.y + VEL + red.height < HEIGHT - 15:  # DOWN
+    if keys_pressed[pg.K_DOWN] and red.y + VEL + red.height < HEIGHT - 15:
         red.y += VEL
 #------------------------Player2-Handling--------------------------#
 
@@ -155,7 +154,7 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 playing = False
-                pg.quit()
+                exit()
             
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_LCTRL and len(yellow_bullets) < MAX_BULLETS:
@@ -185,8 +184,7 @@ def main():
             
         if winner_text != "":
             draw_winner(winner_text)
-            break
-            
+            break     
         YELLOW_HIT,RED_HIT
         keys_pressed = pg.key.get_pressed()
 #--------------------------------------------Logic--------------------------------------------------#
@@ -196,7 +194,8 @@ def main():
         yellow_handle_movement(keys_pressed, yellow)        
         red_handle_movement(keys_pressed, red)
         draw_window(red,yellow,red_bullets,yellow_bullets, red_health, yellow_health)
-        bullet_handler(yellow_bullets,red_bullets,red,yellow)  
+        bullet_handler(yellow_bullets,red_bullets,red,yellow) 
+    pg.time.delay(5000) 
     main()
 #-----------------------------------fucntion-calls-------------------------------#
 if __name__ == '__main__':                  
