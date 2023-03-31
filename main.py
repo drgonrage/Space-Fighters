@@ -2,7 +2,6 @@
 import pygame as pg
 import os
 import time as tm
-import ffmpeg
 #==========================Imports=========================#
 
 #===================Initializing================#
@@ -37,7 +36,7 @@ RED_HIT = pg.USEREVENT + 2
 SHIP_WIDTH = 60
 SHIP_HEIGHT = 50  
 VEL = 6.76
-HEALTH_FONT = pg.font.SysFont('comicsans', 40)
+HEALTH_FONT = pg.font.SysFont('', 30)
 #=========================SHIP=========================#
 
 #---------------------BULLET----------------#  
@@ -52,10 +51,10 @@ RED_SPACESHIP_IMAGE = pg.image.load(os.path.join('Assets', 'spaceship_red.png'))
 RED_SPACESHIP = pg.transform.rotate(pg.transform.scale(RED_SPACESHIP_IMAGE , (SHIP_WIDTH,SHIP_HEIGHT)), (90))
 BACKGROUND_IMAGE = pg.image.load(os.path.join('Assets', 'space.jpeg')) 
 BACKGROUND = pg.transform.scale(BACKGROUND_IMAGE,(WIDTH,HEIGHT))
-BULLET_SOUND = pg.mixer.Sound(os.path.join('Assets', 'Gun.mp3'))
-HIT_SOUND = pg.mixer.Sound(os.path.join('Assets', 'death.mp3'))
-#----------------------IMPORT-ASSETS--------------------# 
-            
+BULLET_SOUND = pg.mixer.Sound(os.path.join('Assets/Gun.mp3'))
+HIT_SOUND = pg.mixer.Sound(os.path.join('Assets', 'hit.mp3'))
+DEATH_SOUND = pg.mixer.Sound(os.path.join('Assets', 'death.mp3'))
+#----------------------IMPORT-ASSETS--------------------#        
 #=========================================================Draw-Window============================================#    
 def draw_window(red, yellow, red_bullets,yellow_bullets, red_health, yellow_health):
     WIN.fill(WHITE)     
@@ -77,11 +76,17 @@ def draw_window(red, yellow, red_bullets,yellow_bullets, red_health, yellow_heal
     pg.display.update()
 #=============================Draw-Winner========================#
 def draw_winner(text):
-    draw_text = HEALTH_FONT.render(text, 1, WHITE)
-    WIN.blit(draw_text, (WIDTH/2 - draw_text.get_width()/2,
+    if text == 'YELLOW WINS':
+        draw_text = HEALTH_FONT.render(text, 1, YELLOW)
+        WIN.blit(draw_text, (WIDTH/2 - draw_text.get_width()/2,
                          HEIGHT/2 - draw_text.get_width()/2))
-    pg.display.update() 
-    pg.time.delay(1000)
+        pg.display.update() 
+    else:
+        draw_text = HEALTH_FONT.render(text, 1, RED)
+        WIN.blit(draw_text, (WIDTH/2 - draw_text.get_width()/2,
+                         HEIGHT/2 - draw_text.get_width()/2))
+        pg.display.update()
+        pg.time.delay(5000) 
       
      
 #=========================================================Draw-Window============================================#    
@@ -149,14 +154,18 @@ def main():
          
         for event in pg.event.get():
             if event.type == pg.QUIT:
-               playing = False
+                playing = False
+                pg.quit()
             
             if event.type == pg.KEYDOWN:
-                if keys_pressed == [pg.K_j]:
-                    yellow_bullets.append()
+                if event.key == pg.K_LCTRL and len(yellow_bullets) < MAX_BULLETS:
+                    bullet = pg.Rect(yellow.x + yellow.width, yellow.y + yellow.height//2 - 2, 10, 5)
+                    yellow_bullets.append(bullet)
                     BULLET_SOUND.play()
-                if keys_pressed == [pg.K_RSHIFT]:
-                    red_bullets.append()
+                    
+                if event.key == pg.K_RCTRL and len(red_bullets) < MAX_BULLETS:
+                    bullet = pg.Rect(red.x - red.width/2, red.y + red.height//2 - 2, 10, 5)
+                    red_bullets.append(bullet)
                     BULLET_SOUND.play()
                     
             if event.type == RED_HIT:
@@ -164,20 +173,22 @@ def main():
             
             if event.type == YELLOW_HIT:
                 yellow_health -= 1
-            winner_text = ''
-            if red_health <= 0:
-                winner_text = 'YELLOW WINS'
-                
-            if yellow_health <= 0:
-                winner_text = 'RED WINS'
+        
+        winner_text = ''
+        if red_health <= 0:
+            winner_text = 'YELLOW WINS'
+            DEATH_SOUND.play()
             
-            if winner_text != '':
-                draw_winner(winner_text)
-                pg.time.delay(2000) 
+        if yellow_health <= 0:
+            winner_text = 'RED WINS'
+            DEATH_SOUND.play()
             
+        if winner_text != "":
+            draw_winner(winner_text)
+            break
             
-            YELLOW_HIT,RED_HIT
-            keys_pressed = pg.key.get_pressed()
+        YELLOW_HIT,RED_HIT
+        keys_pressed = pg.key.get_pressed()
 #--------------------------------------------Logic--------------------------------------------------#
 
 
@@ -186,8 +197,8 @@ def main():
         red_handle_movement(keys_pressed, red)
         draw_window(red,yellow,red_bullets,yellow_bullets, red_health, yellow_health)
         bullet_handler(yellow_bullets,red_bullets,red,yellow)  
-#-----------------------------------fucntion-calls-------------------------------#                 
-
+    main()
+#-----------------------------------fucntion-calls-------------------------------#
 if __name__ == '__main__':                  
     main()
 
