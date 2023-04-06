@@ -1,9 +1,8 @@
-# =Imports
+# Imports
 import pygame as pg
 import os
 import time as tm
-
-# Imports
+import random as rd
 
 # Initializing
 pg.init()
@@ -11,12 +10,11 @@ pg.font.init()
 pg.mixer.init()
 
 
-# Main-Window
+# Main Window
 WIDTH, HEIGHT = 900, 500
 BORDER = pg.Rect(WIDTH // 2 - 5, 0, 10, HEIGHT)
 WIN = pg.display.set_mode((WIDTH, HEIGHT))
 pg.display.set_caption("Blyat")
-
 
 # Color
 WHITE = (255, 255, 255)
@@ -25,14 +23,15 @@ RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 
 
-# FPS-Limit
+# FPS Limit
 FPS = 60
 PLAYING = True
 
 
-# HITREG-EVENTS
+# HITREG EVENTS
 YELLOW_HIT = pg.USEREVENT + 1
 RED_HIT = pg.USEREVENT + 2
+
 # SHIP
 SHIP_WIDTH = 60
 SHIP_HEIGHT = 50
@@ -45,7 +44,7 @@ BULLET_VEL = 15
 MAX_BULLETS = 3
 
 
-# IMPORT-ASSETS
+# IMPORT ASSETS
 YELLOW_SPACESHIP_IMAGE = pg.image.load(os.path.join("Assets", "spaceship_yellow.png"))
 YELLOW_SPACESHIP = pg.transform.rotate(
     pg.transform.scale(YELLOW_SPACESHIP_IMAGE, (SHIP_WIDTH, SHIP_HEIGHT)), (270)
@@ -61,7 +60,7 @@ HIT_SOUND = pg.mixer.Sound(os.path.join("Assets", "hit.mp3"))
 DEATH_SOUND = pg.mixer.Sound(os.path.join("Assets", "death.mp3"))
 
 
-# Draw-Window
+# Draw Window
 def draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_health):
     WIN.fill(WHITE)
     WIN.blit(BACKGROUND, (0, 0))
@@ -73,7 +72,8 @@ def draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_hea
     WIN.blit(yellow_health_text, (10, 10))
     WIN.blit(YELLOW_SPACESHIP, (yellow.x, yellow.y))
     WIN.blit(RED_SPACESHIP, (red.x, red.y))
-    # Drawing-Bullets
+
+    # Drawing Bullets
     for bullet in red_bullets:
         pg.draw.rect(WIN, RED, bullet)
     for bullet in yellow_bullets:
@@ -128,7 +128,7 @@ def red_handle_movement(keys_pressed, red):
         red.y += VEL
 
 
-# BULLET HANDLER
+# Bullet Handler
 def bullet_handler(yellow_bullets, red_bullets, red, yellow):
     for bullet in yellow_bullets:
         bullet.x += BULLET_VEL
@@ -156,8 +156,10 @@ def main():
     yellow_health = 10
     yellow_bullets = []
     red_bullets = []
-    red = pg.Rect(840, 240, SHIP_WIDTH, SHIP_HEIGHT)
-    yellow = pg.Rect(10, 240, SHIP_WIDTH, SHIP_HEIGHT)
+    yellow_random_y = rd.randint(20, HEIGHT - SHIP_HEIGHT)
+    red_random_y = rd.randint(20, HEIGHT - SHIP_HEIGHT)
+    red = pg.Rect(840, red_random_y, SHIP_WIDTH, SHIP_HEIGHT)
+    yellow = pg.Rect(10, yellow_random_y, SHIP_WIDTH, SHIP_HEIGHT)
 
     # CLOCK
     clock = pg.time.Clock()
@@ -168,7 +170,7 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 playing = False
-                pg.quit()
+                exit()
 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_LCTRL and len(yellow_bullets) < MAX_BULLETS:
@@ -214,7 +216,7 @@ def main():
         red_handle_movement(keys_pressed, red)
         draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_health)
         bullet_handler(yellow_bullets, red_bullets, red, yellow)
-    pg.time.delay(5000)
+    pg.time.delay(2000)
     main()
 
 
