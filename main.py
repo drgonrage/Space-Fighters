@@ -1,8 +1,5 @@
 # Imports
-import pygame as pg
-import os
-import time as tm
-import random as rd
+import pygame as pg, os, time as tm, random as rd, sys
 
 # Initializing
 pg.init()
@@ -14,7 +11,7 @@ pg.mixer.init()
 WIDTH, HEIGHT = 900, 500
 BORDER = pg.Rect(WIDTH // 2 - 5, 0, 10, HEIGHT)
 WIN = pg.display.set_mode((WIDTH, HEIGHT))
-pg.display.set_caption("Blyat")
+pg.display.set_caption("SpaceFighters")
 
 # Color
 WHITE = (255, 255, 255)
@@ -36,7 +33,8 @@ RED_HIT = pg.USEREVENT + 2
 SHIP_WIDTH = 60
 SHIP_HEIGHT = 50
 VEL = 6.76
-HEALTH_FONT = pg.font.SysFont("", 30)
+HEALTH_FONT = pg.font.SysFont("impact", 30)
+DEATH_FONT = pg.font.SysFont("impact", 100)
 
 
 # BULLET
@@ -53,10 +51,13 @@ RED_SPACESHIP_IMAGE = pg.image.load(os.path.join("Assets", "spaceship_red.png"))
 RED_SPACESHIP = pg.transform.rotate(
     pg.transform.scale(RED_SPACESHIP_IMAGE, (SHIP_WIDTH, SHIP_HEIGHT)), (90)
 )
+
 BACKGROUND_IMAGE = pg.image.load(os.path.join("Assets", "space.jpeg"))
 BACKGROUND = pg.transform.scale(BACKGROUND_IMAGE, (WIDTH, HEIGHT))
-BULLET_SOUND = pg.mixer.Sound(os.path.join("Assets/Gun.mp3"))
-HIT_SOUND = pg.mixer.Sound(os.path.join("Assets", "hit.mp3"))
+BULLET_SOUND = pg.mixer.Sound(os.path.join("Assets", "Gun.mp3"))
+YELLOW_BULLET = pg.image.load(os.path.join("Assets", "YellowBullets.png"))
+RED_BULLET = pg.image.load(os.path.join("Assets", "RedBullets.png"))
+HIT_SOUND = pg.mixer.Sound(os.path.join("Assets", "Hit.mp3"))
 DEATH_SOUND = pg.mixer.Sound(os.path.join("Assets", "death.mp3"))
 
 
@@ -84,26 +85,26 @@ def draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_hea
 # Draw Winner
 def draw_winner(text):
     if text == "YELLOW WINS":
-        draw_text = HEALTH_FONT.render(text, 1, YELLOW)
+        draw_text = DEATH_FONT.render(text, 1, YELLOW)
         WIN.blit(
             draw_text,
             (
                 WIDTH / 2 - draw_text.get_width() / 2,
-                HEIGHT / 2 - draw_text.get_width() / 2,
+                HEIGHT / 2 - draw_text.get_height() / 2,
             ),
         )
         pg.display.update()
     else:
-        draw_text = HEALTH_FONT.render(text, 1, RED)
+        draw_text = DEATH_FONT.render(text, 1, RED)
         WIN.blit(
             draw_text,
             (
                 WIDTH / 2 - draw_text.get_width() / 2,
-                HEIGHT / 2 - draw_text.get_width() / 2,
+                HEIGHT / 2 - draw_text.get_height() / 2,
             ),
         )
         pg.display.update()
-        pg.time.delay(5000)
+        pg.time.delay(2000)
 
 
 def yellow_handle_movement(keys_pressed, yellow):
@@ -170,7 +171,8 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 playing = False
-                exit()
+                pg.quit()
+                sys.exit()
 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_LCTRL and len(yellow_bullets) < MAX_BULLETS:
@@ -216,7 +218,7 @@ def main():
         red_handle_movement(keys_pressed, red)
         draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_health)
         bullet_handler(yellow_bullets, red_bullets, red, yellow)
-    pg.time.delay(2000)
+    pg.time.delay(1000)
     main()
 
 
