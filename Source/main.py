@@ -18,6 +18,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
+BLUE = (0,100,200)
 
 
 # FPS Limit
@@ -43,22 +44,28 @@ MAX_BULLETS = 3
 
 
 # IMPORT ASSETS
-YELLOW_SPACESHIP_IMAGE = pg.image.load(os.path.join("Assets", "spaceship_yellow.png"))
+YELLOW_SPACESHIP_IMAGE = pg.image.load(os.path.join("Source/Assets", "spaceship_yellow.png"))
 YELLOW_SPACESHIP = pg.transform.rotate(
     pg.transform.scale(YELLOW_SPACESHIP_IMAGE, (SHIP_WIDTH, SHIP_HEIGHT)), (270)
 )
-RED_SPACESHIP_IMAGE = pg.image.load(os.path.join("Assets", "spaceship_red.png"))
+RED_SPACESHIP_IMAGE = pg.image.load(os.path.join("Source/Assets", "spaceship_red.png"))
 RED_SPACESHIP = pg.transform.rotate(
     pg.transform.scale(RED_SPACESHIP_IMAGE, (SHIP_WIDTH, SHIP_HEIGHT)), (90)
 )
 
-BACKGROUND_IMAGE = pg.image.load(os.path.join("Assets", "space.jpeg"))
+BACKGROUND_IMAGE = pg.image.load(os.path.join("Source/Assets", "space.jpeg"))
 BACKGROUND = pg.transform.scale(BACKGROUND_IMAGE, (WIDTH, HEIGHT))
-BULLET_SOUND = pg.mixer.Sound(os.path.join("Assets", "Gun.mp3"))
-YELLOW_BULLET = pg.image.load(os.path.join("Assets", "YellowBullets.png"))
-RED_BULLET = pg.image.load(os.path.join("Assets", "RedBullets.png"))
-HIT_SOUND = pg.mixer.Sound(os.path.join("Assets", "Hit.mp3"))
-DEATH_SOUND = pg.mixer.Sound(os.path.join("Assets", "death.mp3"))
+BULLET_SOUND = pg.mixer.Sound(os.path.join("Source/Assets", "Gun.mp3"))
+YELLOW_BULLET = pg.image.load(os.path.join("Source/Assets", "YellowBullets.png"))
+RED_BULLET = pg.image.load(os.path.join("Source/Assets", "RedBullets.png"))
+HIT_SOUND = pg.mixer.Sound(os.path.join("Source/Assets", "Hit.mp3"))
+DEATH_SOUND = pg.mixer.Sound(os.path.join("Source/Assets", "death.mp3"))
+
+
+# Pause-Menu
+def pause():
+    pass
+
 
 
 # Draw Window
@@ -94,8 +101,18 @@ def draw_winner(text):
             ),
         )
         pg.display.update()
-    else:
+    elif text == 'RED WINS':
         draw_text = DEATH_FONT.render(text, 1, RED)
+        WIN.blit(
+            draw_text,
+            (
+                WIDTH / 2 - draw_text.get_width() / 2,
+                HEIGHT / 2 - draw_text.get_height() / 2,
+            ),
+        )
+        pg.display.update()
+    elif text == 'DRAW':
+        draw_text = DEATH_FONT.render(text, 1, BLUE)
         WIN.blit(
             draw_text,
             (
@@ -199,11 +216,12 @@ def main():
                 yellow_health -= 1
 
         winner_text = ""
-        if red_health <= 0:
+        if yellow_health <=0 and red_health <= 0:
+            winner_text = 'DRAW'    
+        elif red_health <= 0 and yellow_health > 0:
             winner_text = "YELLOW WINS"
             DEATH_SOUND.play()
-
-        if yellow_health <= 0:
+        elif yellow_health <= 0 and red_health > 0:
             winner_text = "RED WINS"
             DEATH_SOUND.play()
 
