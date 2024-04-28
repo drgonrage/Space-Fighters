@@ -21,11 +21,6 @@ YELLOW = (255, 255, 0)
 BLUE = (0,100,200)
 
 
-# FPS Limit
-FPS = 60
-PLAYING = True
-
-
 # HITREG EVENTS
 YELLOW_HIT = pg.USEREVENT + 1
 RED_HIT = pg.USEREVENT + 2
@@ -36,6 +31,7 @@ SHIP_HEIGHT = 50
 VEL = 6.76
 HEALTH_FONT = pg.font.SysFont("impact", 30)
 DEATH_FONT = pg.font.SysFont("impact", 100)
+PAUSE_FONT = pg.font.SysFont("cascadia", 100)
 
 
 # BULLET
@@ -63,8 +59,11 @@ DEATH_SOUND = pg.mixer.Sound(os.path.join("Source/Assets", "death.mp3"))
 
 
 # Pause-Menu
-def pause():
-    pass
+def pause_menu(paused):
+    if paused:
+        print("Paused")
+    else:
+        print("Unpaused")
 
 
 
@@ -169,11 +168,13 @@ def bullet_handler(yellow_bullets, red_bullets, red, yellow):
 
 # Logic
 def main():
-    playing = True
-    red_health = 10
-    yellow_health = 10
-    yellow_bullets = []
-    red_bullets = []
+    FPS:int = 60
+    PAUSED:bool = False
+    playing:bool = True
+    red_health:int = 10
+    yellow_health:int = 10
+    yellow_bullets:list = []
+    red_bullets:list = []
     yellow_random_y = rd.randint(20, HEIGHT - SHIP_HEIGHT)
     red_random_y = rd.randint(20, HEIGHT - SHIP_HEIGHT)
     red = pg.Rect(840, red_random_y, SHIP_WIDTH, SHIP_HEIGHT)
@@ -184,7 +185,6 @@ def main():
 
     while playing:
         clock.tick(FPS)
-
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 playing = False
@@ -192,22 +192,32 @@ def main():
                 sys.exit()
 
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_LCTRL and len(yellow_bullets) < MAX_BULLETS:
-                    bullet = pg.Rect(
-                        yellow.x + yellow.width,
-                        yellow.y + yellow.height // 2 - 2,
-                        10,
-                        5,
-                    )
-                    yellow_bullets.append(bullet)
-                    BULLET_SOUND.play()
+                if not PAUSED:
+                    if event.key == pg.K_LCTRL and len(yellow_bullets) < MAX_BULLETS:
+                        bullet = pg.Rect(
+                            yellow.x + yellow.width,
+                            yellow.y + yellow.height // 2 - 2,
+                            10,
+                            5,
+                        )
+                        yellow_bullets.append(bullet)
+                        BULLET_SOUND.play()
 
-                if event.key == pg.K_RCTRL and len(red_bullets) < MAX_BULLETS:
-                    bullet = pg.Rect(
-                        red.x - red.width / 2, red.y + red.height // 2 - 2, 10, 5
-                    )
-                    red_bullets.append(bullet)
-                    BULLET_SOUND.play()
+                    if event.key == pg.K_RCTRL and len(red_bullets) < MAX_BULLETS:
+                        bullet = pg.Rect(
+                            red.x - red.width / 2, red.y + red.height // 2 - 2, 10, 5
+                        )
+                        red_bullets.append(bullet)
+                        BULLET_SOUND.play()
+                    
+                if event.key == pg.K_ESCAPE:
+                    if not PAUSED:
+                        PAUSED = True
+                        pause_menu(PAUSED)
+                    else:
+                        PAUSED = False
+                        pause_menu(PAUSED)
+
 
             if event.type == RED_HIT:
                 red_health -= 1
@@ -232,10 +242,15 @@ def main():
         keys_pressed = pg.key.get_pressed()
 
         # function-calls
-        yellow_handle_movement(keys_pressed, yellow)
-        red_handle_movement(keys_pressed, red)
-        draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_health)
-        bullet_handler(yellow_bullets, red_bullets, red, yellow)
+        if not PAUSED:
+            draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_health)
+            yellow_handle_movement(keys_pressed, yellow)
+            red_handle_movement(keys_pressed, red)
+            bullet_handler(yellow_bullets, red_bullets, red, yellow)
+        else:
+            draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_health)
+            pause_text = PAUSE_FONT.render("PAUSED", True, BLUE)
+            WIN.blit(pause_text, (WIDTH // 2 - pause_text.get_width() // 2, HEIGHT // 2 - pause_text.get_height() // 2))
     pg.time.delay(1000)
     main()
 
