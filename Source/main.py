@@ -31,8 +31,9 @@ SHIP_HEIGHT = 50
 VEL = 6.76
 HEALTH_FONT = pg.font.SysFont("impact", 30)
 DEATH_FONT = pg.font.SysFont("impact", 100)
-PAUSE_FONT = pg.font.SysFont("cascadia", 100)
+PAUSE_FONT = pg.font.SysFont("cascadia", 140)
 
+pause_text = PAUSE_FONT.render("PAUSED", True, BLUE)
 
 # BULLET
 BULLET_VEL = 15
@@ -61,9 +62,9 @@ DEATH_SOUND = pg.mixer.Sound(os.path.join("Source/Assets", "death.mp3"))
 # Pause-Menu
 def pause_menu(paused):
     if paused:
-        print("Paused")
-    else:
-        print("Unpaused")
+        pause_text = PAUSE_FONT.render("PAUSED", True, YELLOW)
+        WIN.blit(pause_text,((WIDTH - pause_text.get_width()) // 2,(HEIGHT - pause_text.get_height()) // 2))
+        pg.display.update()
 
 
 
@@ -72,7 +73,6 @@ def draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_hea
     WIN.fill(WHITE)
     WIN.blit(BACKGROUND, (0, 0))
     pg.draw.rect(WIN, BLACK, BORDER)
-
     red_health_text = HEALTH_FONT.render("Health: " + str(red_health), 1, RED)
     yellow_health_text = HEALTH_FONT.render("Health: " + str(yellow_health), 1, YELLOW)
     WIN.blit(red_health_text, (WIDTH - red_health_text.get_width() - 10, 10))
@@ -111,7 +111,7 @@ def draw_winner(text):
         )
         pg.display.update()
     elif text == 'DRAW':
-        draw_text = DEATH_FONT.render(text, 1, BLUE)
+        draw_text = DEATH_FONT.render(text, 1, (0,255,0))
         WIN.blit(
             draw_text,
             (
@@ -247,10 +247,7 @@ def main():
             yellow_handle_movement(keys_pressed, yellow)
             red_handle_movement(keys_pressed, red)
             bullet_handler(yellow_bullets, red_bullets, red, yellow)
-        else:
-            draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_health)
-            pause_text = PAUSE_FONT.render("PAUSED", True, BLUE)
-            WIN.blit(pause_text, (WIDTH // 2 - pause_text.get_width() // 2, HEIGHT // 2 - pause_text.get_height() // 2))
+
     pg.time.delay(1000)
     main()
 
